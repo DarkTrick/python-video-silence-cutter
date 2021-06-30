@@ -17,13 +17,13 @@ Make sure, that the path to `ffmpeg` and `ffprobe` are inside the "path variable
 
 ## How to use
 
-- Easiest command: 
+- Easiest command: <br>
 `python3 silence_cutter.py [your video]`
 
-- Show **help** and suggestions: 
+- Show **help** and suggestions: <br>
 `python3 silence_cutter.py --help`
 
-- More Options:
+- More Options: <br>
 `python3 silence_cutter.py [your video] [outfile] [silence dB border]`
 
 

@@ -1,4 +1,4 @@
-Created by DarkTrick - 4fb5f723849d32782e723c34bfd132e442d378d7
+# Created by DarkTrick - 4fb5f723849d32782e723c34bfd132e442d378d7
 
 import subprocess
 import tempfile

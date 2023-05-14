@@ -4,6 +4,18 @@ import subprocess
 import tempfile
 import sys
 import os
+import logging
+
+# ===========================
+# ==== Configure logging ====
+# ===========================
+log_level = logging.ERROR
+log_filename = 'silence_cutter.log'
+logger = logging.getLogger('')
+logger.setLevel(log_level)
+log_handler = logging.FileHandler(log_filename, delay=True)
+logger.addHandler(log_handler)
+
 
 def findSilences(filename, dB = -35):
   """
@@ -12,6 +24,10 @@ def findSilences(filename, dB = -35):
       uneven elements (1,3,5, ...) denote silence end time
 
   """
+  logging.debug(f"findSilences ()")
+  logging.debug(f"    - filename = {filename}")
+  logging.debug(f"    - dB = {dB}")
+
   command = ["ffmpeg","-i",filename,
              "-af","silencedetect=n=" + str (dB) + "dB:d=1",
              "-f","null","-"]
@@ -19,9 +35,12 @@ def findSilences(filename, dB = -35):
   s = str(output)
   lines = s.split("\\n")
   time_list = []
+  logging.debug("  lines: ```\n" + "\n".join(lines) + "```\n\n")
+
   for line in lines:
     if ("silencedetect" in line):
         words = line.split(" ")
+        logging.debug("  words: " + str(words))
         for i in range (len(words)):
             if ("silence_start" in words[i]):
               time_list.append (float(words[i+1]))
@@ -35,6 +54,9 @@ def findSilences(filename, dB = -35):
 
 
 def getVideoDuration(filename:str) -> float:
+  logging.debug(f"getVideoDuration ()")
+  logging.debug(f"    - filename = {filename}")
+
   command = ["ffprobe","-i",filename,"-v","quiet",
              "-show_entries","format=duration","-hide_banner",
              "-of","default=noprint_wrappers=1:nokey=1"]
@@ -71,11 +93,16 @@ def getFileContent_audioFilter(videoSectionTimings):
   return ret
 
 def writeFile (filename, content):
+  logging.debug(f"writeFile ()")
+  logging.debug(f"    - filename = {filename}")
+
   with open (filename, "w") as file:
     file.write (str(content))
 
 
 def ffmpeg_run (file, videoFilter, audioFilter, outfile):
+  logging.debug(f"ffmpeg_run ()")
+
   # prepare filter files
   vFile = tempfile.NamedTemporaryFile (mode="w", encoding="UTF-8", prefix="silence_video")
   aFile = tempfile.NamedTemporaryFile (mode="w", encoding="UTF-8", prefix="silence_audio")
@@ -97,6 +124,11 @@ def ffmpeg_run (file, videoFilter, audioFilter, outfile):
 
 
 def cut_silences(infile, outfile, dB = -35):
+  logging.debug(f"cut_silences ()")
+  logging.debug(f"    - infile = {infile}")
+  logging.debug(f"    - outfile = {outfile}")
+  logging.debug(f"    - dB = {dB}")
+
   print ("detecting silences")
   silences = findSilences (infile,dB)
   duration = getVideoDuration (infile)
@@ -131,6 +163,7 @@ def printHelp():
   print ("          ffprobe")
 
 def main():
+  logging.debug(f"main ()")
   args = sys.argv[1:]
   if (len(args) < 1):
     printHelp()

@@ -33,7 +33,15 @@ def findSilences(filename, dB = -35):
              "-f","null","-"]
   output = subprocess.run (command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
   s = str(output)
-  lines = s.split("\\n")
+
+  splitDelimiter = "\\n"
+
+  # for windows encodings: split on \r\n
+  if("\\r\\n" in s):
+    splitDelimiter = "\\r\\n"
+
+  lines = s.split(splitDelimiter)
+
   time_list = []
   logging.debug("  lines: ```\n" + "\n".join(lines) + "```\n\n")
 
